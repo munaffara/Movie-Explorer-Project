@@ -27,70 +27,37 @@
 // src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
+import { ThemeProvider } from '@mui/material/styles';
 import { AuthProvider } from './context/AuthContext';
-import Login from './components/Login/Login';
-import Home from './components/Home/Home';
-import MovieDetails from './components/MovieDetails/MovieDetails';
-import Favorites from './components/Favorites/Favorites';
-import ProtectedRoute from './components/ProtectedRoute';
+import { MovieProvider } from './context/MovieContext';
+import { ThemeContextProvider } from './context/ThemeContext';
+import Login from './components/Auth/Login';
+import Home from './pages/Home';
+import MoviePage from './pages/MoviePage';
+import Favorites from './pages/Favorites';
+import Navbar from './components/Navbar';
+import PrivateRoute from './components/Auth/PrivateRoute';
 
-const App = () => {
-  const [darkMode, setDarkMode] = React.useState(false);
-
-  const theme = createTheme({
-    palette: {
-      mode: darkMode ? 'dark' : 'light',
-      primary: {
-        main: '#1976d2',
-      },
-      secondary: {
-        main: '#dc004e',
-      },
-    },
-  });
-
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-  };
-
+function App() {
   return (
-    <AuthProvider>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Router>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <Home toggleDarkMode={toggleDarkMode} darkMode={darkMode} />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/movie/:id"
-              element={
-                <ProtectedRoute>
-                  <MovieDetails toggleDarkMode={toggleDarkMode} darkMode={darkMode} />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/favorites"
-              element={
-                <ProtectedRoute>
-                  <Favorites toggleDarkMode={toggleDarkMode} darkMode={darkMode} />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </Router>
-      </ThemeProvider>
-    </AuthProvider>
+    <Router>
+      <AuthProvider>
+        <ThemeContextProvider>
+          <MovieProvider>
+            <Navbar />
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route element={<PrivateRoute />}>
+                <Route path="/" element={<Home />} />
+                <Route path="/movie/:id" element={<MoviePage />} />
+                <Route path="/favorites" element={<Favorites />} />
+              </Route>
+            </Routes>
+          </MovieProvider>
+        </ThemeContextProvider>
+      </AuthProvider>
+    </Router>
   );
-};
+}
 
 export default App;
