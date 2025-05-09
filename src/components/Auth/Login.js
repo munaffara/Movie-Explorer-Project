@@ -13,17 +13,22 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // Static credentials (in a real app, these would be from a backend)
+
     const staticCredentials = {
       username: 'movieadmin',
-      password: 'movies123'
+      password: 'movies123',
     };
 
-    if (username === staticCredentials.username && password === staticCredentials.password) {
-      // Save to localStorage
+    const trimmedUsername = username.trim();
+    const trimmedPassword = password.trim();
+
+    if (
+      trimmedUsername === staticCredentials.username &&
+      trimmedPassword === staticCredentials.password
+    ) {
+      
       localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('username', username);
+      localStorage.setItem('username', trimmedUsername);
       login();
       navigate('/');
     } else {
@@ -32,13 +37,34 @@ const Login = () => {
   };
 
   return (
-    <Container maxWidth="xs">
-      <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Paper elevation={3} sx={{ padding: 4, width: '100%' }}>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)),
+                          url('https://images.unsplash.com/photo-1542206395-9feb3edaa68d?auto=format&fit=crop&w=1950&q=80')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Container maxWidth="xs">
+        <Paper
+          elevation={8}
+          sx={{
+            padding: 4,
+            borderRadius: 3,
+            background: 'rgba(30, 30, 30, 0.8)',
+            backdropFilter: 'blur(10px)',
+            color: '#fff',
+          }}
+        >
           <Typography component="h1" variant="h5" align="center" gutterBottom>
-            Movie Explorer Admin
+            Movie Explorer User
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
             <TextField
               margin="normal"
               required
@@ -47,6 +73,8 @@ const Login = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               autoFocus
+              InputLabelProps={{ style: { color: '#ccc' } }}
+              InputProps={{ style: { color: '#fff' } }}
             />
             <TextField
               margin="normal"
@@ -56,29 +84,39 @@ const Login = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              InputLabelProps={{ style: { color: '#ccc' } }}
+              InputProps={{ style: { color: '#fff' } }}
             />
             {error && (
-              <Typography color="error" variant="body2">
+              <Typography color="error" variant="body2" sx={{ mt: 1 }}>
                 {error}
               </Typography>
             )}
-            <p>username: 'movieadmin',
-      password: 'movies123'</p>
+            <Typography variant="caption" color="gray" sx={{ mt: 2, mb: 2 }}>
+              <div>Username: <strong>movieadmin</strong></div>
+              <div>Password: <strong>movies123</strong></div>
+            </Typography>
+
             <Button
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{
+                mt: 2,
+                bgcolor: '#e50914',
+                '&:hover': { bgcolor: '#b0060f' },
+              }}
             >
               Sign In
             </Button>
           </Box>
+
+          <Typography variant="body2" align="center" sx={{ mt: 3, color: '#aaa' }}>
+            Official Movie Explorer Admin Portal
+          </Typography>
         </Paper>
-        <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 4 }}>
-          Official Movie Explorer Admin Portal
-        </Typography>
-      </Box>
-    </Container>
+      </Container>
+    </Box>
   );
 };
 
