@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardMedia, CardContent, Typography, CardActionArea, Rating, Box, useTheme } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
+
 const MovieCard = ({ movie }) => {
   const navigate = useNavigate();
   const theme = useTheme(); // Get the current theme
@@ -10,6 +11,8 @@ const MovieCard = ({ movie }) => {
   const handleClick = () => {
     navigate(`/movie/${movie.id}`);
   };
+
+  
 
   // Theme-dependent styles
   const cardBackground = theme.palette.mode === 'dark' ? '#424242' : '#ffffff';
@@ -31,6 +34,7 @@ const MovieCard = ({ movie }) => {
           transform: 'scale(1.05)', // Hover effect
         },
       }}
+      
     >
       <CardActionArea onClick={handleClick} sx={{ flexGrow: 1 }}>
         <CardMedia

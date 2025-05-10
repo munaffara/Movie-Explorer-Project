@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import api from '../services/api';
 
+
 export const MovieContext = createContext();
 
 export const MovieProvider = ({ children }) => {
@@ -11,6 +12,8 @@ export const MovieProvider = ({ children }) => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [favorites, setFavorites] = useState([]);
+  const [genres, setGenres] = useState([]);
+  const [loadingGenres, setLoadingGenres] = useState(false);
 
   useEffect(() => {
     // Load favorites from localStorage
@@ -96,6 +99,8 @@ export const MovieProvider = ({ children }) => {
   return (
     <MovieContext.Provider
       value={{
+        genres,
+  loadingGenres,
         trendingMovies,
         searchResults,
         loading,

@@ -1,5 +1,4 @@
-// src/components/MovieFilters.js
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -8,46 +7,40 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Chip,
   Button,
-  useTheme
+  useTheme,
+  CircularProgress
 } from '@mui/material';
 import { MovieContext } from '../context/MovieContext';
 
-const MovieFilters = () => {
-  const { searchResults, trendingMovies, searchMovies } = useContext(MovieContext);
+const MovieFilters = ({ onFilterChange }) => {
+  const { searchResults, trendingMovies, genres, loadingGenres } = useContext(MovieContext);
   const theme = useTheme();
-  const [filters, setFilters] = useState({
-    genre: '',
-    year: [1990, new Date().getFullYear()],
-    rating: [0, 10]
-  });
-
-  // Get unique genres from movies
-  const allGenres = [
-    ...new Set(
-      [...trendingMovies, ...searchResults]
-        .flatMap(movie => movie.genre_ids || [])
-    )
-  ];
-
-  // Year range for slider
   const currentYear = new Date().getFullYear();
   const yearRange = [1980, currentYear];
 
-  const handleFilterChange = (name, value) => {
-    setFilters(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+  const [filters, setFilters] = useState({
+    genre: '',
+    year: [1990, currentYear],
+    rating: [0, 10]
+  });
 
-  const applyFilters = () => {
+  // Get unique genre IDs from movies that exist in our genres list
+  const availableGenreIds = [
+    ...new Set(
+      [...trendingMovies, ...searchResults]
+        .flatMap(movie => movie.genre_ids || [])
+        .filter(id => genres?.some(g => g.id === id)) // Only keep IDs that exist in genres
+    )
+  ];
+
+  // Apply filters whenever they change
+  useEffect(() => {
     const moviesToFilter = searchResults.length > 0 ? searchResults : trendingMovies;
     
-    return moviesToFilter.filter(movie => {
-      // Genre filter
-      if (filters.genre && !movie.genre_ids?.includes(Number(filters.genre))) {
+    const filtered = moviesToFilter.filter(movie => {
+      // Genre filter - convert both to numbers for comparison
+      if (filters.genre && !movie.genre_ids?.some(id => id === Number(filters.genre))) {
         return false;
       }
       
@@ -64,6 +57,15 @@ const MovieFilters = () => {
       
       return true;
     });
+
+    onFilterChange(filtered);
+  }, [filters, searchResults, trendingMovies, onFilterChange]);
+
+  const handleFilterChange = (name, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const clearFilters = () => {
@@ -74,7 +76,13 @@ const MovieFilters = () => {
     });
   };
 
-  const filteredMovies = applyFilters();
+  if (loadingGenres) {
+    return (
+      <Box display="flex" justifyContent="center" p={3}>
+        <CircularProgress size={24} />
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -96,13 +104,17 @@ const MovieFilters = () => {
           value={filters.genre}
           onChange={(e) => handleFilterChange('genre', e.target.value)}
           label="Genre"
+          disabled={!genres || genres.length === 0}
         >
           <MenuItem value="">All Genres</MenuItem>
-          {allGenres.map(genreId => (
-            <MenuItem key={genreId} value={genreId}>
-              {getGenreName(genreId)}
-            </MenuItem>
-          ))}
+          {availableGenreIds.map(genreId => {
+            const genre = genres.find(g => g.id === genreId);
+            return (
+              <MenuItem key={genreId} value={String(genreId)}> {/* Convert to string for Select */}
+                {genre?.name || 'Unknown'}
+              </MenuItem>
+            );
+          })}
         </Select>
       </FormControl>
 
@@ -111,7 +123,7 @@ const MovieFilters = () => {
       </Typography>
       <Slider
         value={filters.year}
-        onChange={(e, newValue) => handleFilterChange('year', newValue)}
+        onChange={(_, newValue) => handleFilterChange('year', newValue)}
         valueLabelDisplay="auto"
         min={yearRange[0]}
         max={yearRange[1]}
@@ -123,7 +135,7 @@ const MovieFilters = () => {
       </Typography>
       <Slider
         value={filters.rating}
-        onChange={(e, newValue) => handleFilterChange('rating', newValue)}
+        onChange={(_, newValue) => handleFilterChange('rating', newValue)}
         valueLabelDisplay="auto"
         min={0}
         max={10}
@@ -131,43 +143,16 @@ const MovieFilters = () => {
         sx={{ mb: 3 }}
       />
 
-      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Button
           variant="outlined"
           onClick={clearFilters}
-          sx={{ mr: 2 }}
         >
           Clear Filters
         </Button>
       </Box>
     </Box>
   );
-};
-
-// Helper function to get genre name from ID
-const getGenreName = (genreId) => {
-  const genreMap = {
-    28: 'Action',
-    12: 'Adventure',
-    16: 'Animation',
-    35: 'Comedy',
-    80: 'Crime',
-    99: 'Documentary',
-    18: 'Drama',
-    10751: 'Family',
-    14: 'Fantasy',
-    36: 'History',
-    27: 'Horror',
-    10402: 'Music',
-    9648: 'Mystery',
-    10749: 'Romance',
-    878: 'Science Fiction',
-    10770: 'TV Movie',
-    53: 'Thriller',
-    10752: 'War',
-    37: 'Western'
-  };
-  return genreMap[genreId] || 'Unknown';
 };
 
 export default MovieFilters;
