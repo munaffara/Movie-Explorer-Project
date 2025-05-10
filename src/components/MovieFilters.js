@@ -145,6 +145,7 @@ const MovieFilters = ({ onFilterChange }) => {
 
       <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Button
+          type="button"
           variant="outlined"
           onClick={clearFilters}
         >

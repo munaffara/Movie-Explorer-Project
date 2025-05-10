@@ -9,7 +9,8 @@ const MovieCard = ({ movie }) => {
   const theme = useTheme(); // Get the current theme
 
   const handleClick = () => {
-    navigate(`/movie/${movie.id}`);
+    navigate(`/movie/${movie.id}`, { state: { from: window.location.pathname } });
+    window.scrollTo(0, 0); // Optional: scroll to top
   };
 
   

@@ -25,18 +25,20 @@ const MovieDetails = () => {
   const { addToFavorites, favorites } = useContext(MovieContext);
   const [isFavorite, setIsFavorite] = useState(false);
 
-  useEffect(() => {
+    useEffect(() => {
     const fetchMovieDetails = async () => {
       try {
+        setLoading(true);
         const response = await api.get(`/movie/${id}`, {
           params: {
             append_to_response: 'videos,credits'
           }
         });
         setMovie(response.data);
-        setLoading(false);
+        setError(null);
       } catch (err) {
         setError(err.response?.data?.status_message || err.message);
+      } finally {
         setLoading(false);
       }
     };
