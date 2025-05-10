@@ -1,6 +1,6 @@
 // src/pages/Home.js
 import React, { useContext, useEffect, useState } from 'react';
-import { Container, Grid, Typography, Box, Button, CircularProgress, Alert } from '@mui/material';
+import { Container, Grid, Typography, Box, Button, CircularProgress, Alert, useTheme } from '@mui/material';
 import MovieCard from '../components/MovieCard';
 import SearchBar from '../components/SearchBar';
 import { MovieContext } from '../context/MovieContext';
@@ -17,6 +17,7 @@ const Home = () => {
   } = useContext(MovieContext);
   
   const [showTrending, setShowTrending] = useState(true);
+  const theme = useTheme(); // Get the current theme
 
   useEffect(() => {
     if (searchResults.length > 0) {
@@ -28,8 +29,13 @@ const Home = () => {
 
   if (error) return <Alert severity="error">{error}</Alert>;
 
+  // Theme-dependent styling
+  const backgroundColor = theme.palette.mode === 'dark' ? '#333' : '#f9f9f9';
+  const textColor = theme.palette.mode === 'dark' ? 'white' : 'black';
+  const containerShadow = theme.palette.mode === 'dark' ? 6 : 3;
+
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4, padding: 3 }}>
       <Box sx={{ mb: 4 }}>
         <SearchBar />
       </Box>
@@ -42,7 +48,7 @@ const Home = () => {
         <>
           {showTrending ? (
             <>
-              <Typography variant="h5" gutterBottom>
+              <Typography variant="h5" gutterBottom sx={{ color: textColor }}>
                 Trending Movies
               </Typography>
               <Grid container spacing={4}>
@@ -55,7 +61,7 @@ const Home = () => {
             </>
           ) : (
             <>
-              <Typography variant="h5" gutterBottom>
+              <Typography variant="h5" gutterBottom sx={{ color: textColor }}>
                 Search Results
               </Typography>
               <Grid container spacing={4}>
